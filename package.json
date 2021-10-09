@@ -1,0 +1,20 @@
+{
+  "name": "cc_typedef_gen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "flow": "flow",
+    "babel": "babel",
+    "build": "\"$npm_execpath\" run flow && babel src/ -d out/"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.8",
+    "@babel/preset-flow": "^7.14.5",
+    "flow-bin": "^0.161.0"
+  }
+}

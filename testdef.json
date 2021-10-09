@@ -1,0 +1,32 @@
+{
+  "uninject": ["function", "uninject(): void"],
+  "cum": ["function", "cum(): void"],
+  "modules": {
+    "webpack": [
+      ["const", "modules: Object"],
+      ["function", "find(filter: Function): undefined | Object | Function"],
+      ["function", "findAll(filter: Function): Array<any | Function>"],
+      [
+        "function",
+        "findByProps(...propNames: Array<String>): undefined | Object | Function"
+      ],
+      [
+        "function",
+        "findByPropsAll(...propNames: Array<String>): Array<any | Object | Function>"
+      ],
+      [
+        "function",
+        "findByPrototypes(...protoNames: Array<String>): Array<any | Object | Function>"
+      ],
+      ["function", "findByDisplayName(displayName: String): any"],
+      [
+        "function",
+        "findByStrings(...searchStrings: Array<String>): undefined | Object | Function"
+      ],
+      [
+        "function",
+        "findByKeywordAll(...searchStrings: Array<String>): Array<any | Object | Function>"
+      ]
+    ]
+  }
+}
