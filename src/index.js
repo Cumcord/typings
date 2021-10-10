@@ -17,12 +17,6 @@ function members(obj: any): [string, any][] {
     return Object.keys(obj).map((key) => [key, obj[key]]);
 }
 
-// define some types that describe the input data, so we can take full advantage of static typing
-type namespaceMember = [string, "function" | "const"];
-type namespace = [string, namespaceMember[]];
-type module = [string, namespace[]];
-type definitionElement = module | namespace | namespaceMember;
-
 function parseRawDef(obj: any): definitionElement[] {
     return members(obj).map((m) => parseElement(m[0], m[1]));
 }

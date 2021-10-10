@@ -1,0 +1,6 @@
+//@flow
+
+declare type namespaceMember = [string, "function" | "const"];
+declare type namespace = [string, namespaceMember[]];
+declare type module = [string, namespace[]];
+declare type definitionElement = module | namespace | namespaceMember;
