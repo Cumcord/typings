@@ -1,0 +1,45 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ master ]
+    tags: "**"
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Build
+      run: |
+          build () {
+            dotnet publish -r $1 --no-restore --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=True -p:TrimMode=Link defgen/defgen.fsproj -o build/$1/
+          }
+          
+          dotnet restore
+          build linux-x64
+          build win-x64
+          build osx-x64
+
+          mv build/linux-x64/defgen build/defgen-linux
+          mv build/win-x64/defgen.exe build/defgen-win.exe
+          mv build/osx-x64/defgen build/defgen-osx
+
+          rm build/*/*.pdb
+    
+    - name: Publish
+      uses: ncipollo/release-action@v1
+      with: 
+        artifacts: "build/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        allowUpdates: true
+        tag: build
