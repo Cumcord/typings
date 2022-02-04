@@ -23,7 +23,10 @@ let main args =
             printfn $"%s{msg}"
             1
         | Success nspcChildren ->
-            let rootNamespace = {name = args[0]; children = nspcChildren}
-            let expanded = Transform.expand rootNamespace
-            printfn $"%s{rootNamespace.name}, %i{rootNamespace.children.Length}, %i{expanded.Length}"
+            let defs = 
+                {name = args[0]; children = nspcChildren}
+                |> Transform.expand       // @cumcord/* import madness
+                |> Emitter.emitAllModules // emit to .d.ts defs
+                
+            printfn $"%s{defs}" 
             0

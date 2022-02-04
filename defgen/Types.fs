@@ -6,7 +6,7 @@ type Result<'a> =
 
 exception FormatException of string
 
-type PropKind = Const | Function
+type PropKind = Const | Function 
 
 let parsePropKind =
     function
