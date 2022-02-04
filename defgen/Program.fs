@@ -24,5 +24,6 @@ let main args =
             1
         | Success nspcChildren ->
             let rootNamespace = {name = args[0]; children = nspcChildren}
-            printfn $"%s{rootNamespace.name}, %i{rootNamespace.children.Length}"
+            let expanded = Transform.expand rootNamespace
+            printfn $"%s{rootNamespace.name}, %i{rootNamespace.children.Length}, %i{expanded.Length}"
             0

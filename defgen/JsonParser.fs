@@ -1,9 +1,10 @@
+/// Responsible for parsing JSON into a nice data structure
 module defgen.JsonParser
 
 open FSharp.Data
 open defgen.Types
 
-let listToNspc name list = Nmspc({name = name; children = list})
+let listToNspc name list = Nmspc {name = name; children = list}
 
 /// Parses an array of [string, string] to a `Prop`
 let private parseProp (elems: JsonValue[]) =
@@ -38,7 +39,7 @@ let private parseListToProps nspName (elems: JsonValue[]) =
                     | _ -> raise (FormatException("Prop list type was incorrect")))
             |> listToNspc nspName
             |> Some
-        | _ -> Some(Prp(parseProp elems))
+        | _ -> Some (Prp(parseProp elems))
 
 /// Recursively parses into a list of NamespaceChild (wraps recursed down in a Namespace)
 let rec private recursiveParse jsonVal =
