@@ -2,3 +2,5 @@ obj
 bin
 defs.d.ts
 .idea
+.ionide
+.fake

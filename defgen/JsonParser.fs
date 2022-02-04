@@ -20,25 +20,28 @@ let rec private recursiveParse jsonVal =
     | JsonValue.Record props ->
         props
         |> Array.toList
-        |> List.map (fun v ->
-                match snd v with
-                | JsonValue.Record _ -> recursiveParse (snd v)
-                | JsonValue.Array elems ->
-                    if elems.Length = 0 then
-                        []
-                    else
-                        match elems[0] with
-                        | JsonValue.Array _ ->
-                            elems
-                            |> Array.toList
-                            |> List.map(function
-                                    | JsonValue.Array es -> Prp(parseProp es)
-                                    | _ -> raise (FormatException("Prop list type was incorrect")))
-                        | _ -> [Prp(parseProp elems)]
-                        
-                | _ -> raise (FormatException("Record value was not a valid type"))
-                    )
-        |> List.concat
+        |> List.choose (fun v ->
+            let listToNspc list = Nmspc({name = fst v; children = list})
+            
+            match snd v with
+            | JsonValue.Record _ -> (snd v) |> recursiveParse |> listToNspc |> Some
+            | JsonValue.Array elems ->
+                if elems.Length = 0 then
+                    None // List.choose BRRRRR
+                else
+                    match elems[0] with
+                    | JsonValue.Array _ ->
+                        elems
+                        |> Array.toList
+                        |> List.map(function
+                                | JsonValue.Array es -> Prp(parseProp es)
+                                | _ -> raise (FormatException("Prop list type was incorrect")))
+                        |> listToNspc
+                        |> Some
+                    | _ -> Some(Prp(parseProp elems))
+                    
+            | _ -> raise (FormatException("Record value was not a valid type"))
+            )
         
     | _ -> raise (FormatException("JSON was not a usable type, should be a namespace"))
 
