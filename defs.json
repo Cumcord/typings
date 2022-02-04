@@ -1,6 +1,10 @@
 {
   "uninject": ["function", "uninject(): void"],
-  "cum": ["function", "cum(): void"],
+  "cum": ["function", "cum(): void | Promise<void>"],
+  "dev": [
+    ["function", "showSettings(): void"],
+    ["function", "toggleDevMode(): void"]
+  ],
   "modules": {
     "webpack": [
       ["const", "modules: Object"],
@@ -27,6 +31,31 @@
         "function",
         "findByKeywordAll(...searchStrings: Array<String>): Array<any | Object | Function>"
       ]
+    ],
+    "common": [
+      ["const", "constants: undefined | Object | Function"],
+      ["const", "channels: undefined | Object | Function"],
+      ["const", "Flux: undefined | Object | Function"],
+      ["const", "FluxDispatcher: undefined | Object | Function"],
+      ["const", "i18n: Array<any | Object | Function>"],
+      ["const", "React: undefined | Object | Function"],
+      ["const", "ReactDOM: undefined | Object | Function"],
+      ["const", "Redux: undefined | Object | Function"],
+      ["const", "zustand: undefined | Object | Function"]
     ]
-  }
+  },
+  "plugins": [
+    ["function", "importPlugin(baseUrl: string): void"],
+    ["function", "deletePlugin(pluginId: string): void"],
+    ["function", "togglePlugin(pluginId: string): void"]
+  ],
+  "patcher": [
+    ["function", "before(functionName: string, functionParent: Object | Function, callback: (arguments: Array<any | Object | Function>) => any): () => boolean"],
+    ["function", "after(functionName: string, functionParent: Object | Function, callback: (arguments: Array<any | Object | Function>, returnValue: any) => any): () => boolean"],
+    ["function", "instead(functionName: string, functionParent: Object | Function, callback: (arguments: Array<any | Object | Function>) => any): () => boolean"],
+    ["function", "injectCSS(newCss?: string): void"]
+  ],
+  "utils": [
+    ["function", "findInTree(tree: Array<any> | Object, searchFilter: string | (object: Array<any> | Object) => boolean, { walkable: Array<any> = null, ignore: Array<any>, limit: number = 100 } = {})"]
+  ]
 }
