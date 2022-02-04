@@ -9,6 +9,7 @@
         <Compile Include="Types.fs" />
         <Compile Include="JsonParser.fs" />
         <Compile Include="Transform.fs" />
+        <Compile Include="Emitter.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
