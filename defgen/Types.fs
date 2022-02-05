@@ -6,16 +6,8 @@ type Result<'a> =
 
 exception FormatException of string
 
-type PropKind = Const | Function 
-
-let parsePropKind =
-    function
-    | "const" -> Const
-    | "function" -> Function
-    | s -> raise (FormatException($"Cannot parse `%s{s}` as prop kind"))
-
 type Prop = {
-    kind: PropKind
+    kind: string
     typedef: string
 }
 

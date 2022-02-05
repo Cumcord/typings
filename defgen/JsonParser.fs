@@ -15,7 +15,7 @@ let private parseProp (elems: JsonValue[]) =
         | JsonValue.String s ->
             match elems[1] with
             | JsonValue.String s2 ->
-                { kind = parsePropKind s; typedef = s2 }
+                { kind = s; typedef = s2 }
                 
             | _ -> raise (FormatException("Prop arrays must contain strings"))
             

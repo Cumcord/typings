@@ -21,7 +21,7 @@ let moduleTemplate name children =
 }}"""
 
 let emitProp (prop: Prop) =
-    propTemplate (match prop.kind with | Const -> "const" | Function -> "function") prop.typedef
+    propTemplate prop.kind prop.typedef
 
 let rec private emitNamespaceOrModule isMod (nmsp: Namespace) =
     let template = if isMod then moduleTemplate else namespaceTemplate
