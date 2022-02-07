@@ -35,6 +35,11 @@ jobs:
           mv build/osx-x64/defgen build/defgen-osx
 
           rm build/*/*.pdb
+
+    - name: Generate defs
+      run: |
+        chmod +x build/defgen-linux
+        cat defs.json | build/defgen-linux '@cumcord' > build/defs.d.ts
     
     - name: Publish
       uses: ncipollo/release-action@v1
