@@ -102,7 +102,7 @@
     "modals": [
       [
         "function",
-        "showConfirmationModal(data: {header?: string, confirmText?: string, cancelText?: string, content?: string, type?: string}, callback?: (boolean) => void): Promise<boolean>"
+        "showConfirmationModal(data: {header?: string, confirmText?: string, cancelText?: string, content?: string, type?: string}, callback?: (res: boolean) => void): Promise<boolean>"
       ]
     ],
     "toasts": [
