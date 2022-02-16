@@ -1,6 +1,6 @@
 {
   "uninject": ["function", "uninject(): void"],
-  "cum": ["function", "cum(): void | Promise<void>"],
+  "cum": ["function", "cum(cockSize?: number, cumshotStrength?: number): string | Promise<string>"],
   "dev": [
     ["function", "showSettings(): void"],
     ["function", "toggleDevMode(): void"]
