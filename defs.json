@@ -57,9 +57,11 @@
     }
   },
   "plugins": [
-    ["function", "importPlugin(baseUrl: string): void"],
-    ["function", "deletePlugin(pluginId: string): void"],
-    ["function", "togglePlugin(pluginId: string): void"]
+    ["function", "importPlugin(baseUrl: string): Promise<void>"],
+    ["function", "removePlugin(pluginId: string): void"],
+    ["function", "togglePlugin(pluginId: string): void"],
+    ["const", "installed: Object"],
+    ["const", "loaded: Object"]
   ],
   "patcher": [
     [
@@ -100,13 +102,13 @@
     "modals": [
       [
         "function",
-        "showConfirmationModal(data: {header?: string, confirmText?: string, cancelText?: string, content?: string, type: string}, callback: undefined | Function): Promise<boolean>"
+        "showConfirmationModal(data: {header?: string, confirmText?: string, cancelText?: string, content?: string, type?: string}, callback?: (boolean) => void): Promise<boolean>"
       ]
     ],
     "toasts": [
       [
         "function",
-        "showToast(data: {title: string, content: string, onClick?: Function, className?: string, duration?: number}): void"
+        "showToast(data: {title: string, content?: string, onClick?: Function, className?: string, duration?: number}): void"
       ]
     ]
   }
