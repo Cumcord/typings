@@ -2,29 +2,31 @@ name: Build and Release
 
 on:
   push:
-    branches: [ master ]
-    tags: "**"
+    branches: [master]
+    tags: '**'
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 6.0.x
-        
-    - name: Build
-      run: |
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - uses: actions/setup-node@v2
+        with:
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Build
+        run: |
           build () {
             dotnet publish -r $1 --no-restore --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=True -p:TrimMode=Link defgen/defgen.fsproj -o build/$1/
           }
-          
+
           dotnet restore
           build linux-x64
           build win-x64
@@ -36,15 +38,23 @@ jobs:
 
           rm build/*/*.pdb
 
-    - name: Generate defs
-      run: |
-        chmod +x build/defgen-linux
-        cat defs.json | build/defgen-linux '@cumcord' > build/defs.d.ts
-    
-    - name: Publish
-      uses: ncipollo/release-action@v1
-      with: 
-        artifacts: "build/*"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        allowUpdates: true
-        tag: build
+      - name: Generate defs
+        run: |
+          chmod +x build/defgen-linux
+          cat defs.json | build/defgen-linux '@cumcord' > build/defs.d.ts
+          cp build/defs.d.ts npm_package/
+
+      - name: Publish artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: 'build/*'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          tag: build
+
+      - name: Publish package
+        working-directory: npm_package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

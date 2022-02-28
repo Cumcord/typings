@@ -1,6 +1,7 @@
 {
   "name": "cumcord-types",
   "description": "Type definitions for Cumcord.",
+  "version": "0.0.1",
   "types": "defs.d.ts",
   "repository": {
     "type": "git",
