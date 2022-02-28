@@ -1,0 +1,9 @@
+{
+  "name": "cumcord-types",
+  "description": "Type definitions for Cumcord.",
+  "types": "defs.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cumcord/typings.git"
+  }
+}
