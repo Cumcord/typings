@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <Compile Include="Util.fs" />
-        <Compile Include="JsonParser.fs" />
         <Compile Include="YamlParser.fs" />
         <Compile Include="Transform.fs" />
         <Compile Include="Emitter.fs" />
