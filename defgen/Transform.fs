@@ -1,7 +1,7 @@
 /// Expands the namespace tree into a list of every namespace that needs to be emitted
 module defgen.Transform
 
-open defgen.Types
+open defgen.Util
 
 /// Does the madness required for cumcord's funky import syntax
 let expand (nmsp: Namespace) =

@@ -1,7 +1,7 @@
 /// Emits .d.ts files from a data structure
 module defgen.Emitter
 
-open defgen.Types
+open defgen.Util
 
 let private indent (str: string) =
     str.Split "\n"

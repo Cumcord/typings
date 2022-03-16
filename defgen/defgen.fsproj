@@ -7,8 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Types.fs" />
+        <Compile Include="Util.fs" />
         <Compile Include="JsonParser.fs" />
+        <Compile Include="YamlParser.fs" />
         <Compile Include="Transform.fs" />
         <Compile Include="Emitter.fs" />
         <Compile Include="Program.fs" />
@@ -16,6 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="Fsharp.Data" Version="4.2.7" />
+        <PackageReference Include="YamlDotNet" Version="11.2.1" />
     </ItemGroup>
 
 </Project>

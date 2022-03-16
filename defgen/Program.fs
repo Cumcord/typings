@@ -1,6 +1,6 @@
 ﻿open System
 open defgen
-open defgen.Types
+open defgen.Util
 
 let readStdIn () =
     let rec readRec working =
@@ -17,7 +17,9 @@ let main args =
         1
     else
         let raw = readStdIn ()
-        let parsedInput = JsonParser.parse raw
+        let parsed = YamlParser.parse raw
+        0
+        (*let parsedInput = JsonParser.parse raw
         match parsedInput with
         | Failure msg ->
             printfn $"%s{msg}"
@@ -29,4 +31,4 @@ let main args =
                 |> Emitter.emitAllModules // emit to .d.ts defs
                 
             printfn $"%s{defs}" 
-            0
+            0*)
