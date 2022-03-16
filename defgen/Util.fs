@@ -16,29 +16,26 @@ type Prop = {
     typedef: string
 }
 
-type Namespace = {
+type FullNamespace = {
     name: string
-    children: NamespaceChild list
+    children: FullNamespaceChild list
 }
-and NamespaceChild =
-    | Nmspc of Namespace
-    | Prp of Prop
+and FullNamespaceChild =
+    | FNmspc of FullNamespace
+    | FPrp of Prop
 
-type Defs = {
+type ParsedDefs = {
     imports: string list option
-    defs: NamespaceChild list
+    defs: FullNamespaceChild list
 }
 
+type NamespaceReference = string
 
-/// lists all props on an object
-let inline (!?) (object: obj) =
-    object.GetType().GetProperties()
-    |> Array.toList
-    |> List.map (fun p -> (p.Name, p.GetValue object))
+type PropOrReference =
+    | CPrp of Prop
+    | CRef of NamespaceReference
 
-/// dynamically gets the value of a property safely
-let inline (?) (object: obj) prop =
-    let prop = !? object |> List.tryFind (fst >> ((=) prop))
-    match prop with
-    | None -> None
-    | Some p -> Some (snd p)
+type ContractedNamespace = {
+    name: string
+    children: PropOrReference list
+}

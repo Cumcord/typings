@@ -17,18 +17,17 @@ let main args =
         1
     else
         let raw = readStdIn ()
-        let parsed = YamlParser.parse raw
-        0
-        (*let parsedInput = JsonParser.parse raw
+        let parsedInput = YamlParser.parse raw
         match parsedInput with
-        | Failure msg ->
-            printfn $"%s{msg}"
+        | None ->
+            printfn "Parse failed"
             1
-        | Success nspcChildren ->
+        | Some def ->
+            let rootNamespace: FullNamespace = {name = args[0]; children = def.defs} 
             let defs = 
-                {name = args[0]; children = nspcChildren}
-                |> Transform.expand       // @cumcord/* import madness
+                rootNamespace
+                |> Transform.flatten      // @cumcord/* import madness
                 |> Emitter.emitAllModules // emit to .d.ts defs
                 
             printfn $"%s{defs}" 
-            0*)
+            0

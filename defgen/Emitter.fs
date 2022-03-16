@@ -23,15 +23,15 @@ let moduleTemplate name children =
 let emitProp (prop: Prop) =
     propTemplate (string prop.kind) prop.typedef
 
-let rec private emitNamespaceOrModule isMod (nmsp: Namespace) =
+let rec private emitNamespaceOrModule isMod (nmsp: ContractedNamespace) =
     let template = if isMod then moduleTemplate else namespaceTemplate
     
     template
         nmsp.name
         (nmsp.children
          |> List.map (function
-             | Nmspc ns -> emitNamespaceOrModule false ns
-             | Prp prop -> emitProp prop)
+             | FNmspc ns -> emitNamespaceOrModule false ns
+             | FPrp prop -> emitProp prop)
          |> String.concat "\n")
 
 let emitNamespace = emitNamespaceOrModule false

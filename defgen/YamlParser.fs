@@ -36,8 +36,8 @@ let rec private (|NamespaceChildren|_|) (content: obj) =
             oArr
             |> Seq.toList
             |> List.map (function
-                | Property p -> Some (Prp p)
-                | Namespace n -> Some (Nmspc n)
+                | Property p -> Some (FPrp p)
+                | Namespace n -> Some (FNmspc n)
                 | _ -> None)
             
         if children |> List.forall ((<>) None) then
