@@ -78,22 +78,22 @@ let private (|Imports|_|) (raw: obj) =
             None
     | _ -> None
 
-let private (|TypeDef|_|) (topLevel: obj) =
+let private (|TypeDef|_|) name (topLevel: obj) =
     match topLevel with
     | :? Dictionary<obj, obj> as dict ->
         if dict.ContainsKey "defs" then
             match dict["defs"] with
             | NamespaceChildren defs ->
                 match dict.TryGetValue "imports" with
-                | true, Imports i -> Some { imports = Some i; defs = defs }
-                | false, _ -> Some { imports = None; defs = defs }
+                | true, Imports i -> Some { imports = Some i; defs = { name = name; children = defs } }
+                | false, _ -> Some { imports = None; defs = { name = name; children = defs } }
                 | _ -> None
             | _ -> None
         else
             None
     | _ -> None
 
-let parse yml =
+let parse name yml =
     match deserialize yml with
-    | TypeDef d -> Some d
+    | TypeDef name d -> Some d
     | _ -> None

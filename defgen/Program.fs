@@ -17,17 +17,16 @@ let main args =
         1
     else
         let raw = readStdIn ()
-        let parsedInput = YamlParser.parse raw
+        let parsedInput = YamlParser.parse args[0] raw
         match parsedInput with
         | None ->
             printfn "Parse failed"
             1
-        | Some def ->
-            let rootNamespace: FullNamespace = {name = args[0]; children = def.defs} 
+        | Some def -> 
             let defs = 
-                rootNamespace
+                def.defs
                 |> Transform.flatten      // @cumcord/* import madness
-                |> Emitter.emitAllModules // emit to .d.ts defs
+                |> Emitter.emitFull def.imports // emit to .d.ts defs
                 
             printfn $"%s{defs}" 
             0

@@ -9,7 +9,7 @@ type PropType =
         | "function" -> Ok Function
         | _ -> Error "not const or function"
     
-    member this.ToString = match this with | Const -> "const" | Function -> "function"
+    override this.ToString () = match this with | Const -> "const" | Function -> "function"
 
 type Prop = {
     kind: PropType
@@ -26,10 +26,11 @@ and FullNamespaceChild =
 
 type ParsedDefs = {
     imports: string list option
-    defs: FullNamespaceChild list
+    defs: FullNamespace
 }
 
-type NamespaceReference = string
+// (full name, subname)
+type NamespaceReference = string * string
 
 type PropOrReference =
     | CPrp of Prop

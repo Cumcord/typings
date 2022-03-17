@@ -41,7 +41,7 @@ jobs:
       - name: Generate defs
         run: |
           chmod +x build/defgen-linux
-          cat defs.json | build/defgen-linux '@cumcord' > build/defs.d.ts
+          cat defs.yml | build/defgen-linux '@cumcord' > build/defs.d.ts
           cp build/defs.d.ts npm_package/
 
       - name: Publish artifacts

@@ -1,0 +1,78 @@
+imports:
+  - nests
+
+defs:
+- [function, 'uninject(): void']
+- [function, 'cum(size?: number, strength?: number): string | Promise<string>']
+- dev:
+  - [function, 'showSettings(): void']
+  - [function, 'toggleDevMode(): void']
+
+- modules:
+  - webpack:
+    - [const, 'modules: Object']
+    - [function, 'find(filter: Function): any']
+    - [function, 'findAll(filter: Function): any[]']
+    - [function, 'findByProps(...props: string[]): any']
+    - [function, 'findByPropsAll(...props: string[]): any[]']
+    - [function, 'findByPrototypes(...protos: string[]): any']
+    - [function, 'findByDisplayName(name: string, parent?: boolean): any']
+    - [function, 'findByDisplayNameAll(name: string): any[]']
+    - [function, 'findByStrings(...searches: string[]): any']
+    - [function, 'findByKeywordAll(...keywords: string[]): any[]']
+    - [function, 'findAsync(filter: () => any): [Promise<any>, () => void]']
+
+  - common:
+    - [const, 'constants: Object']
+    - [const, 'channels: Object']
+    - [const, 'Flux: Object']
+    - [const, 'FluxDispatcher: Object']
+    - [const, 'i18n: Object']
+    - [const, 'React: Object']
+    - [const, 'ReactDOM: Object']
+    - [const, 'Redux: Object']
+    - [const, 'zustand: Function']
+    - [const, 'highlightjs: Object']
+
+    - uuid:
+      - [function, 'v4(): string']
+
+  - internal:
+    - idbKeyval:
+      - [function, 'get<T>(path: string): Promise<T>']
+      - [function, 'set<T>(path: string, value: T): Promise<void>']
+    - nests:
+      - [const, 'Events: nests.Events']
+      - [const, 'make: nests.make']
+
+- plugins:
+  - [function, 'importPlugin(url: string): Promise<void>']
+  - [function, 'removePlugin(id: string): void']
+  - [function, 'togglePlugin(id: string): void']
+  # TODO: Properly type these records (add an extra field to the yaml syntax)
+  - [const, 'installed: nests.Nest<Record<string, Object>>']
+  - [const, 'loaded: nests.Nest<Record<string, Object>>']
+
+- patcher:
+  - [function, 'before(funcName: string, funcParent: Object | Function, callback: (args: any[]) => any[] | undefined): () => void']
+  - [function, 'after(funcName: string, funcParent: Object | Function, callback: (args: any[], ret: any) => any | undefined): () => void']
+  - [function, 'instead(funcName: string, funcParent: Object | Function, callback: (args: any[], orig: Function) => any | undefined): () => void']
+  # TODO: find a way to type this accurately
+  - [function, 'injectCss(css: string): () => void']
+  - [function, 'findAndPatch<T>(modFind: () => T | undefined, patchCallback: (m: T) => () => void): () => void']
+
+- utils:
+  - [function, 'findInTree(tree: any[] | Object, filter: string | ((obj: any[] | Object) => boolean), options: { walkable?: string[], ignore?: string[], limit?: number }): any']
+  - [function, 'findInReactTree(tree: any[] | Object, filter: string | ((obj: any[] | Object) => boolean)): any']
+  - [function, 'copyText(text: string): void']
+  - [function, 'getOwnerInstance(elem: any): any']
+  - [function, 'getReactInstance(elem: HTMLElement): any']
+  - logger:
+    - [function, 'log(...args: any[]): void']
+    - [function, 'warn(...args: any[]): void']
+    - [function, 'error(...args: any[]): void']
+
+  - [function, 'sleep(time?: number): Promise<void>']
+  - [function, 'useNest(nest: nests.Nest<any>): void']
+
+# TODO: type ui, double-check all defs and that imports work right
