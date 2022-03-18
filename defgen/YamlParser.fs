@@ -1,99 +1,74 @@
 /// Responsible for parsing YAML into a nice data structure
 module defgen.YamlParser
 
-open System.Collections.Generic
-open System.IO
-open System.Text
-open YamlDotNet.Serialization
+open FSharp.Data
 open defgen.Util
 
-/// :husk:
-let private deserialize (x: string) =
-    x |> Encoding.Default.GetBytes |> MemoryStream |> StreamReader |> Deserializer().Deserialize
-
-let private (|PropertyType|_|) (v: obj) =
-    match v with
-    | :? string as str ->
-        match PropType.parse str with
-        | Ok(r) -> Some r
-        | Error _ -> None
+let private (|PropType|_|) =
+    function
+    | YamlValue.String (PropertyType t) -> Some t
     | _ -> None
 
-let private (|Property|_|) (prop: obj) =
-    match prop with
-    | :? IList<obj> as arr ->
-        match arr |> Seq.toArray with
-        // active patterns :SanOhYes:
-        | [| PropertyType t; :? string as def |] -> Some { kind = t; typedef = def }
-        | _ -> None
-        
+let private (|Property|_|) =
+    function
+    // active patterns and just pattern matching in general :SanOhYes:
+    | YamlValue.Sequence [|PropType t; YamlValue.String def|] -> Some {kind = t; typedef = def}
     | _ -> None
 
-let rec private (|NamespaceChildren|_|) (content: obj) =
-    match content with
-    | :? IList<obj> as oArr ->
+let rec private (|NamespaceChildren|_|) =
+    function
+    | YamlValue.Sequence rawChildren ->
         let children =
-            oArr
+            rawChildren
             |> Seq.toList
-            |> List.map (function
-                | Property p -> Some (FPrp p)
-                | Namespace n -> Some (FNmspc n)
+            |> List.choose (function
+                | Property p -> Some(FPrp p)
+                | Namespace n -> Some(FNmspc n)
                 | _ -> None)
-            
-        if children |> List.forall ((<>) None) then
-            Some (children |> List.choose id)
+
+        if children.Length = rawChildren.Length then
+            Some children
         else
             None
     | _ -> None
 
-and private (|Namespace|_|) (nmsp: obj) =
-    match nmsp with
-    | :? Dictionary<obj, obj> as dict ->
-        match dict |> Seq.toList with
-        | [pair] ->
-            let rawValue = pair.Value
-            match rawValue with
-            | NamespaceChildren c ->
-                match pair.Key with
-                | :? string as name -> Some { name = name; children = c }
-                | _ -> None
-            | _ -> None
+and private (|Namespace|_|) =
+    function
+    | YamlValue.StringMapping [|(name, NamespaceChildren c)|] -> Some {name = name; children = c}
+    | _ -> None
+
+let private (|Imports|_|) =
+    function
+    | YamlValue.Sequence elems ->
+        let imps =
+            elems
+            |> Seq.toList
+            |> List.choose (function
+                | YamlValue.String s -> Some s
+                | _ -> None)
+
+        if imps.Length = elems.Length then
+            Some imps
+        else
+            None
+    | _ -> None
+
+let private (|TypeDef|_|) name (topLevel: YamlValue) =
+    match topLevel?defs with
+    | Some (NamespaceChildren defs) ->
+        let makeNs imports =
+            Some
+                {imports = imports
+                 defs = {name = name; children = defs}}
+
+        match topLevel?imports with
+        | Some (Imports i) -> makeNs (Some i)
+        | None -> makeNs None
         | _ -> None
-        
     | _ -> None
 
-let private (|Imports|_|) (raw: obj) =
-    match raw with
-    | :? IList<obj> as arr ->
-        let matchingLists =
-            arr
-            |> Seq.toList
-            |> List.map (function
-                | :? string as s -> Some s
-                | _ -> None)
-            
-        if matchingLists |> List.forall ((<>) None) then
-            Some (matchingLists |> List.choose id)
-        else
-            None
-    | _ -> None
-
-let private (|TypeDef|_|) name (topLevel: obj) =
-    match topLevel with
-    | :? Dictionary<obj, obj> as dict ->
-        if dict.ContainsKey "defs" then
-            match dict["defs"] with
-            | NamespaceChildren defs ->
-                match dict.TryGetValue "imports" with
-                | true, Imports i -> Some { imports = Some i; defs = { name = name; children = defs } }
-                | false, _ -> Some { imports = None; defs = { name = name; children = defs } }
-                | _ -> None
-            | _ -> None
-        else
-            None
-    | _ -> None
-
-let parse name yml =
-    match deserialize yml with
-    | TypeDef name d -> Some d
-    | _ -> None
+let parse name =
+    YamlValue.Parse
+    >> function
+        | TypeDef name d -> Some d
+        | _ -> None

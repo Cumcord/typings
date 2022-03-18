@@ -4,3 +4,4 @@ defs.d.ts
 .idea
 .ionide
 .fake
+*.DotSettings.user

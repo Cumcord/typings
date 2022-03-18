@@ -5,7 +5,10 @@ open defgen.Util
 
 
 let inline private joinPath prefix next =
-    if prefix = "" then next else prefix + "/" + next
+    if prefix = "" then
+        next
+    else
+        prefix + "/" + next
 
 /// Recursively flattens the namespace tree and replaces subnamespaces with references
 let flatten rootNamespace =
@@ -16,9 +19,8 @@ let flatten rootNamespace =
                 | FNmspc subNs -> Some(flattenNamespaces (joinPath path subNs.name) subNs)
                 | FPrp _ -> None)
             |> List.concat
-            //|> List.map (fun ns -> { ns with name = prefix + "/" + ns.name }: FullNamespace)
-        
-        { nsToFlat with name = path } ::subs
+
+        {nsToFlat with name = path} :: subs
 
     // replaces the tree with a single layer of references to other (now flattened) namespaces
     let referencify (ns: FullNamespace) =
@@ -28,7 +30,7 @@ let flatten rootNamespace =
                 | FPrp p -> CPrp p
                 | FNmspc n -> CRef(ns.name + "/" + n.name, n.name))
 
-        { name = ns.name; children = children }
+        {name = ns.name; children = children}
 
     rootNamespace
     // first, find all namespaces in the tree and bring them to top level
