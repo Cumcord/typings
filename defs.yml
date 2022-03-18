@@ -74,5 +74,13 @@ defs:
 
   - [function, 'sleep(time?: number): Promise<void>']
   - [function, 'useNest(nest: nests.Nest<any>): void']
+  
+- ui:
+  - components:
+    - [const, 'ErrorBoundary: Function'] # TODO: React component
+  - modals:
+    - [function, 'showConfirmationModal(data: {header?: string, confirmText?: string, cancelText?: string, content?: string, type?: string}, callback?: (res: boolean) => void): Promise<boolean>']
+  - toasts:
+    - [function, 'showToast(data: {title: string, content?: string, onClick?: Function, className?: string, duration?: number}): void']
 
-# TODO: type ui, double-check all defs and that imports work right
+# TODO: double-check all defs and that imports work right
