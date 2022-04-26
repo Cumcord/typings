@@ -21,13 +21,17 @@ jobs:
         with:
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Install dependencies
+        run: |
+          dotnet restore
+          npm i -g typescript typedoc
+
       - name: Build
         run: |
           build () {
             dotnet publish -r $1 --no-restore --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=True -p:TrimMode=Link defgen/defgen.fsproj -o build/$1/
           }
 
-          dotnet restore
           build linux-x64
           build win-x64
           build osx-x64
@@ -42,7 +46,7 @@ jobs:
         run: |
           chmod +x build/defgen-linux
           cat defs.json | build/defgen-linux '@cumcord' > build/defs.d.ts
-          cp build/defs.d.ts npm_package/
+          mv build/defs.d.ts npm_package/
 
       - name: Publish artifacts
         uses: ncipollo/release-action@v1
@@ -59,3 +63,29 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Build docs page
+        run: |
+          touch tsconfig.json
+          typedoc npm_package/defs.d.ts
+
+      - run: tar --directory docs -hcf artifact.tar .
+      - uses: actions/upload-artifact@v3
+        with:
+          name: github-pages
+          path: ./artifact.tar
+
+  # Deploy the artifact to GitHub pages.
+  # This is a separate job so that only actions/deploy-pages has the necessary permissions.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url  }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v1
