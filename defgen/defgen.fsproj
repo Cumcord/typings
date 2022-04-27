@@ -7,15 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Types.fs" />
-        <Compile Include="JsonParser.fs" />
-        <Compile Include="Transform.fs" />
-        <Compile Include="Emitter.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="Util.fs"/>
+        <Compile Include="YamlParser.fs"/>
+        <Compile Include="Transform.fs"/>
+        <Compile Include="Emitter.fs"/>
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Fsharp.Data" Version="4.2.7" />
+        <PackageReference Include="FSharp.Data.Yaml" Version="1.0.0"/>
     </ItemGroup>
 
 </Project>

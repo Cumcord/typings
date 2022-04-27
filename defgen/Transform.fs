@@ -1,23 +1,39 @@
 /// Expands the namespace tree into a list of every namespace that needs to be emitted
 module defgen.Transform
 
-open defgen.Types
+open defgen.Util
 
-/// Does the madness required for cumcord's funky import syntax
-let expand (nmsp: Namespace) =
-    let rec expandRec nmsp name =
-        let subNamespaces =
-            nmsp.children
+
+let inline private joinPath prefix next =
+    if prefix = "" then
+        next
+    else
+        prefix + "/" + next
+
+/// Recursively flattens the namespace tree and replaces subnamespaces with references
+let flatten rootNamespace =
+    let rec flattenNamespaces path (nsToFlat: FullNamespace) =
+        let subs =
+            nsToFlat.children
             |> List.choose (function
-                | Nmspc ns -> Some(expandRec ns (name + "/" + ns.name))
-                | Prp _ -> None)
+                | FNmspc subNs -> Some(flattenNamespaces (joinPath path subNs.name) subNs)
+                | FMem _ -> None)
             |> List.concat
-        
-        let renamedNmsp = { nmsp with name = name }
-        
-        if subNamespaces.Length = 0 then
-            [renamedNmsp]
-        else
-            renamedNmsp :: subNamespaces
-    
-    expandRec nmsp nmsp.name
+
+        {nsToFlat with name = path} :: subs
+
+    // replaces the tree with a single layer of references to other (now flattened) namespaces
+    let referencify (ns: FullNamespace) =
+        let children =
+            ns.children
+            |> List.map (function
+                | FMem p -> CMem p
+                | FNmspc n -> CRef(ns.name + "/" + n.name, n.name))
+
+        {name = ns.name; children = children}
+
+    rootNamespace
+    // first, find all namespaces in the tree and bring them to top level
+    |> flattenNamespaces rootNamespace.name
+    // now replace the now redundant subnamespaces with references to the top level ones
+    |> List.map referencify

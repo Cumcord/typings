@@ -4,3 +4,8 @@ defs.d.ts
 .idea
 .ionide
 .fake
+*.DotSettings.user
+node_modules
+# i know you're not supposed to commit these but oh well
+pnpm-lock.yaml
+package-lock.json

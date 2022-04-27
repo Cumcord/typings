@@ -1,0 +1,189 @@
+toplevel: '@cumcord'
+
+decls: |
+  interface ModalOptions {
+    header?: string
+    confirmText?: string
+    cancelText?: string
+    content?: string
+    type?: "neutral" | "danger" | "confirm"
+  }
+  
+  interface ToastOptions {
+    title: string
+    content?: string
+    onClick?: () => void
+    className?: string
+    duration?: number
+  }
+  
+  interface CommandArg {
+    name: string,
+    description: string,
+    type?: "string" | "bool" | "user" | "channel" | "role"
+    required?: boolean
+  }
+  
+  interface CommandOptions {
+    name: string
+    description: string
+    args: CommandArg[]
+    handler: (ctx: any, send: (m: string | Object) => void) => Promise<string | void> | string | void
+  }
+  
+  type TreeSearchFilter = string | ((node: any) => boolean)
+  
+  interface TreeSearchOptions {
+    walkable?: string[]
+    ignore?: string[]
+    limit?: number
+  }
+  
+  interface BatchFindFilters {
+    find:    (filter: (m: any) => boolean) => void
+    findAll: (filter: (m: any) => boolean) => void
+  
+    findByDisplayName:    (name: string, defExp?: boolean) => void
+    findByDisplayNameAll: (name: string, defExp?: boolean) => void
+  
+    findByKeywordAll:    (...keywords: string[]) => void
+    findByProps:         (...props:    string[]) => void
+    findByPropsAll:      (...props:    string[]) => void
+    findByPrototypes:    (...protos:   string[]) => void
+    findByPrototypesAll: (...protos:   string[]) => void
+    findByStrings:       (...strs:     string[]) => void
+    findByStringsAll:    (...strs:     string[]) => void
+  }
+  
+  interface LoadedNestValue {
+    // onLoad actually has a very complex type, but honestly thats such a corner case that its not worth it
+    onLoad?: () => void
+    onUnload: () => void
+    settings?: Function | Object // react component or element
+  }
+  
+  interface InstalledNestValue {
+    enabled: boolean
+    js: string
+    update: boolean
+    manifest: Object // is it worth replicating the manifest format twice? probably not.
+  }
+  
+  type InjectCssReturn = (newCSS?: string) => void | InjectCssReturn
+  
+  interface DomFindOptions {
+    parent?: boolean
+    displayName?: boolean
+    blockList?: string[]
+  }
+
+defs:
+- [function, 'uninject(): void']
+- [function, 'cum(size?: number, strength?: number): string | Promise<string>']
+
+- pluginData:
+  - [import, nests]
+  - [const, 'id: string']
+  - [const, 'persist: _nests.Nest<any>']
+  
+  - manifest:
+    - [const, 'name: string']
+    - [const, 'description: string']
+    - [const, 'author: string']
+    - [const, 'license: undefined | string']
+    - [const, 'media: undefined | string | string[]']
+    - [const, 'url: undefined | string'] # origin hosting URL, added by mirroring repos
+
+- dev:
+  - [import, nests]
+  - [function, 'showSettings(): void']
+  - [function, 'toggleDevMode(): void']
+  - [const, 'isEnabled: boolean']
+  - [const, 'storage: undefined | _nests.Nest<any>']
+
+- commands:
+  - [function, 'addCommand(opts: CommandOptions): () => void']
+
+- modules:
+  - webpack:
+    - [const, 'modules: Object']
+    - [function, 'getModule(mod: any): any']
+    - [function, 'find(filter: (m: any) => boolean): any']
+    - [function, 'findAll(filter: (m: any) => boolean): any[]']
+    - [function, 'findByProps(...props: string[]): any']
+    - [function, 'findByPropsAll(...props: string[]): any[]']
+    - [function, 'findByPrototypes(...protos: string[]): any']
+    - [function, 'findByPrototypesAll(...protos: string[]): any[]']
+    - [function, 'findByDisplayName(name: string, defaultExp?: boolean): any']
+    - [function, 'findByDisplayNameAll(name: string, defaultExp?: boolean): any[]']
+    - [function, 'findByStrings(...searches: string[]): any']
+    - [function, 'findByStringsAll(...searches: string[]): any[]']
+    - [function, 'findByKeywordAll(...keywords: string[]): any[]']
+    - [function, 'findAsync(filter: () => any, legacy: false): [Promise<any>, () => void]']
+    - [function, 'batchFind(callback: (filters: BatchFindFilters) => void): any[]']
+
+  - common:
+    - [const, 'constants: Object']
+    - [const, 'channels: Object']
+    - [const, 'Flux: Object']
+    - [const, 'FluxDispatcher: Object']
+    - [const, 'i18n: Object']
+    # @types/react defs use `export =` format, so instead of export * from, import * from + export{} must be used
+    # this workaround does not affect the functionality of typedoc
+    - [import, react]
+    - [export, _react as React]
+    - [export, ReactDOM, react-dom]
+    - [const, 'Redux: Object']
+    - [const, 'zustand: Function']
+    - [const, 'highlightjs: Object']
+
+    - uuid:
+      - [function, 'v4(): string']
+
+  - internal:
+    - [export, nests, nests]
+
+    - idbKeyval:
+      - [function, 'get<T>(path: string): Promise<T>']
+      - [function, 'set<T>(path: string, value: T): Promise<void>']
+
+- plugins:
+  - [import, nests]
+  - [function, 'importPlugin(url: string): Promise<void>']
+  - [function, 'removePlugin(id: string): void']
+  - [function, 'togglePlugin(id: string): void']
+  - [const, 'installed: _nests.Nest<Record<string, InstalledNestValue>>']
+  - [const, 'loaded: _nests.Nest<Record<string, LoadedNestValue>>']
+
+- patcher:
+  - [import, spitroast]
+  - [const, 'before: typeof _spitroast.before']
+  - [const, 'after: typeof _spitroast.after']
+  - [const, 'instead: typeof _spitroast.instead']
+  - [function, 'injectCss(css: string): InjectCssReturn']
+  - [function, 'findAndPatch<T>(modFind: () => T | undefined, patchCallback: (m: T) => () => void): () => void']
+
+- utils:
+  - [import, nests]
+  - [function, 'findInTree(tree: any[] | Object, filter: TreeSearchFilter, options: TreeSearchOptions): any']
+  - [function, 'findInReactTree(tree: any[] | Object, filter: TreeSearchFilter): any']
+  - [function, 'findByDomNode(node: HTMLElement, opts?: DomFindOptions): any']
+  - [function, 'copyText(text: string): void']
+  - [function, 'getOwnerInstance(elem: any): any']
+  - [function, 'getReactInstance(elem: HTMLElement): Object | undefined']
+  - logger:
+    - [function, 'log(...args: any[]): void']
+    - [function, 'warn(...args: any[]): void']
+    - [function, 'error(...args: any[]): void']
+
+  - [function, 'sleep(time?: number): Promise<void>']
+  - [function, 'useNest(nest: _nests.Nest<any>): void']
+  
+- ui:
+  - components:
+    - [import, react]
+    - [const, 'ErrorBoundary: _react.ComponentType']
+  - modals:
+    - [function, 'showConfirmationModal(data: ModalOptions, callback?: (res: boolean) => void): Promise<boolean>']
+  - toasts:
+    - [function, 'showToast(data: ToastOptions): void']

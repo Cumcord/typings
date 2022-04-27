@@ -1,32 +1,28 @@
 ﻿open System
 open defgen
-open defgen.Types
+open defgen.Util
 
 let readStdIn () =
     let rec readRec working =
         match Console.Read() with
         | -1 -> working
         | c -> readRec (working + string (char c))
-    
+
     readRec ""
 
 [<EntryPoint>]
-let main args =
-    if args.Length <> 1 || String.IsNullOrWhiteSpace args[0] then
-        printfn "Please pass just a root name in argv"
+let main _ =
+    let parsedInput = readStdIn() |> YamlParser.parse
+    
+    match parsedInput with
+    | None ->
+        printfn "Parse failed"
         1
-    else
-        let raw = readStdIn ()
-        let parsedInput = JsonParser.parse raw
-        match parsedInput with
-        | Failure msg ->
-            printfn $"%s{msg}"
-            1
-        | Success nspcChildren ->
-            let defs = 
-                {name = args[0]; children = nspcChildren}
-                |> Transform.expand       // @cumcord/* import madness
-                |> Emitter.emitAllModules // emit to .d.ts defs
-                
-            printfn $"%s{defs}" 
-            0
+    | Some def -> 
+        let defs = 
+            def.defs
+            |> Transform.flatten // @cumcord/* import madness
+            |> Emitter.emitFull def.decls // emit to .d.ts defs
+            
+        printfn $"%s{defs}" 
+        0
