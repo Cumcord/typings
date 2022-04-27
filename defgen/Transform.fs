@@ -17,7 +17,7 @@ let flatten rootNamespace =
             nsToFlat.children
             |> List.choose (function
                 | FNmspc subNs -> Some(flattenNamespaces (joinPath path subNs.name) subNs)
-                | FPrp _ -> None)
+                | FMem _ -> None)
             |> List.concat
 
         {nsToFlat with name = path} :: subs
@@ -27,7 +27,7 @@ let flatten rootNamespace =
         let children =
             ns.children
             |> List.map (function
-                | FPrp p -> CPrp p
+                | FMem p -> CMem p
                 | FNmspc n -> CRef(ns.name + "/" + n.name, n.name))
 
         {name = ns.name; children = children}

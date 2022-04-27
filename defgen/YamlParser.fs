@@ -4,15 +4,24 @@ module defgen.YamlParser
 open FSharp.Data
 open defgen.Util
 
-let private (|PropType|_|) =
+let private (|MemType|_|) =
     function
-    | YamlValue.String (PropertyType t) -> Some t
+    | YamlValue.String (MemberType t) -> Some t
     | _ -> None
 
-let private (|Property|_|) =
+let private (|Member|_|) =
     function
     // active patterns and just pattern matching in general :SanOhYes:
-    | YamlValue.Sequence [|PropType t; YamlValue.String def|] -> Some {kind = t; typedef = def}
+    | YamlValue.Sequence [|MemType Export; YamlValue.String name; YamlValue.String src|] ->
+        Some
+            {kind = Export
+             typedef = name
+             secondPart = Some src}
+    | YamlValue.Sequence [|MemType t; YamlValue.String def|] ->
+        Some
+            {kind = t
+             typedef = def
+             secondPart = None}
     | _ -> None
 
 let rec private (|NamespaceChildren|_|) =
@@ -22,7 +31,7 @@ let rec private (|NamespaceChildren|_|) =
             rawChildren
             |> Seq.toList
             |> List.choose (function
-                | Property p -> Some(FPrp p)
+                | Member p -> Some(FMem p)
                 | Namespace n -> Some(FNmspc n)
                 | _ -> None)
 
@@ -37,28 +46,7 @@ and private (|Namespace|_|) =
     | YamlValue.StringMapping [|(name, NamespaceChildren c)|] -> Some {name = name; children = c}
     | _ -> None
 
-let private (|Imports|_|) =
-    function
-    | YamlValue.Sequence elems ->
-        let strs =
-            elems
-            |> Seq.toList
-            |> List.choose (function
-                | YamlValue.String s -> Some s
-                | _ -> None)
-
-        if strs.Length = elems.Length then
-            Some strs
-        else
-            None
-    | _ -> None
-
 let private (|TypeDef|_|) (ymlRoot: YamlValue) =
-    let imports =
-        match ymlRoot?imports with
-        | Some (Imports i) -> Some i
-        | _ -> None
-
     let decls =
         match ymlRoot?decls with
         | Some (YamlValue.String d) -> Some d
@@ -70,15 +58,11 @@ let private (|TypeDef|_|) (ymlRoot: YamlValue) =
         | Some (NamespaceChildren defs) ->
 
             Some
-                {imports = imports
-                 decls = decls
+                {decls = decls
                  defs = {name = toplevel; children = defs}}
 
         | _ -> None
     | _ -> None
 
-let parse =
-    YamlValue.Parse
-    >> function // active patterns moment
-        | TypeDef d -> Some d
-        | _ -> None
+// turns out you can call active patterns as normal functions too!
+let parse = YamlValue.Parse >> (|TypeDef|_|)

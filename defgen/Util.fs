@@ -2,23 +2,29 @@ module defgen.Util
 
 open FSharp.Data
 
-type PropType =
+type MemberType =
     | Const
     | Function
+    | Export
+    | Import
 
     static member parse =
         function
         | "const" -> Ok Const
         | "function" -> Ok Function
-        | _ -> Error "not const or function"
+        | "export" -> Ok Export
+        | "import" -> Ok Import
+        | _ -> Error "not valid member type"
 
     override this.ToString() =
         match this with
         | Const -> "const"
         | Function -> "function"
+        | Export -> "export"
+        | Import -> "import"
 
-let (|PropertyType|_|) =
-    PropType.parse
+let (|MemberType|_|) =
+    MemberType.parse
     >> function
         | Ok r -> Some r
         | Error _ -> None
@@ -27,7 +33,10 @@ let (|PropertyType|_|) =
 let (?) (ymlVal: YamlValue) prop =
     ymlVal.TryGetProperty(YamlValue.String prop)
 
-type Prop = {kind: PropType; typedef: string}
+type Member =
+    {kind: MemberType
+     typedef: string
+     secondPart: string option}
 
 type FullNamespace =
     {name: string
@@ -35,23 +44,19 @@ type FullNamespace =
 
 and FullNamespaceChild =
     | FNmspc of FullNamespace
-    | FPrp of Prop
+    | FMem of Member
 
 type ParsedDefs =
-    {imports: string list option
-     decls: string option
+    {decls: string option
      defs: FullNamespace}
 
 // (full name, subname)
 type NamespaceReference = string * string
 
-type PropOrReference =
-    | CPrp of Prop
+type MemberOrReference =
+    | CMem of Member
     | CRef of NamespaceReference
 
 type ContractedNamespace =
     {name: string
-     children: PropOrReference list}
-
-// more functional and nice than a member access
-let trimString (x: string) = x.Trim()
+     children: MemberOrReference list}

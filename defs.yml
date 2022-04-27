@@ -1,11 +1,5 @@
 toplevel: '@cumcord'
 
-imports:
-  - nests
-  - spitroast
-  - react
-  - react-dom
-
 decls: |
   interface ModalOptions {
     header?: string
@@ -65,7 +59,7 @@ decls: |
     // onLoad actually has a very complex type, but honestly thats such a corner case that its not worth it
     onLoad?: () => void
     onUnload: () => void
-    settings?: react.ComponentType<any> | react.ElementType
+    settings?: Function | Object // react component or element
   }
   
   interface InstalledNestValue {
@@ -88,8 +82,9 @@ defs:
 - [function, 'cum(size?: number, strength?: number): string | Promise<string>']
 
 - pluginData:
+  - [import, nests]
   - [const, 'id: string']
-  - [const, 'persist: nests.Nest<any>']
+  - [const, 'persist: _nests.Nest<any>']
   
   - manifest:
     - [const, 'name: string']
@@ -100,10 +95,11 @@ defs:
     - [const, 'url: undefined | string'] # origin hosting URL, added by mirroring repos
 
 - dev:
+  - [import, nests]
   - [function, 'showSettings(): void']
   - [function, 'toggleDevMode(): void']
   - [const, 'isEnabled: boolean']
-  - [const, 'storage: undefined | nests.Nest<any>']
+  - [const, 'storage: undefined | _nests.Nest<any>']
 
 - commands:
   - [function, 'addCommand(opts: CommandOptions): () => void']
@@ -132,8 +128,8 @@ defs:
     - [const, 'Flux: Object']
     - [const, 'FluxDispatcher: Object']
     - [const, 'i18n: Object']
-    - [const, 'React: typeof react']
-    - [const, 'ReactDOM: typeof react_dom']
+    - [export, React, react]
+    - [export, ReactDOM, react-dom]
     - [const, 'Redux: Object']
     - [const, 'zustand: Function']
     - [const, 'highlightjs: Object']
@@ -142,43 +138,48 @@ defs:
       - [function, 'v4(): string']
 
   - internal:
-    - [const, 'nests: typeof nests']
+    - [export, nests, nests]
+
     - idbKeyval:
       - [function, 'get<T>(path: string): Promise<T>']
       - [function, 'set<T>(path: string, value: T): Promise<void>']
 
 - plugins:
+  - [import, nests]
   - [function, 'importPlugin(url: string): Promise<void>']
   - [function, 'removePlugin(id: string): void']
   - [function, 'togglePlugin(id: string): void']
-  - [const, 'installed: nests.Nest<Record<string, InstalledNestValue>>']
-  - [const, 'loaded: nests.Nest<Record<string, LoadedNestValue>>']
+  - [const, 'installed: _nests.Nest<Record<string, InstalledNestValue>>']
+  - [const, 'loaded: _nests.Nest<Record<string, LoadedNestValue>>']
 
 - patcher:
-  - [const, 'before: typeof spitroast.before']
-  - [const, 'after: typeof spitroast.after']
-  - [const, 'instead: typeof spitroast.instead']
+  - [import, spitroast]
+  - [const, 'before: typeof _spitroast.before']
+  - [const, 'after: typeof _spitroast.after']
+  - [const, 'instead: typeof _spitroast.instead']
   - [function, 'injectCss(css: string): InjectCssReturn']
   - [function, 'findAndPatch<T>(modFind: () => T | undefined, patchCallback: (m: T) => () => void): () => void']
 
 - utils:
+  - [import, nests]
   - [function, 'findInTree(tree: any[] | Object, filter: TreeSearchFilter, options: TreeSearchOptions): any']
   - [function, 'findInReactTree(tree: any[] | Object, filter: TreeSearchFilter): any']
   - [function, 'findByDomNode(node: HTMLElement, opts?: DomFindOptions): any']
   - [function, 'copyText(text: string): void']
   - [function, 'getOwnerInstance(elem: any): any']
-  - [function, 'getReactInstance(elem: HTMLElement): any']
+  - [function, 'getReactInstance(elem: HTMLElement): Object | undefined']
   - logger:
     - [function, 'log(...args: any[]): void']
     - [function, 'warn(...args: any[]): void']
     - [function, 'error(...args: any[]): void']
 
   - [function, 'sleep(time?: number): Promise<void>']
-  - [function, 'useNest(nest: nests.Nest<any>): void']
+  - [function, 'useNest(nest: _nests.Nest<any>): void']
   
 - ui:
   - components:
-    - [const, 'ErrorBoundary: react.ComponentType']
+    - [import, react]
+    - [const, 'ErrorBoundary: _react.ComponentType']
   - modals:
     - [function, 'showConfirmationModal(data: ModalOptions, callback?: (res: boolean) => void): Promise<boolean>']
   - toasts:

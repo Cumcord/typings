@@ -9,7 +9,8 @@ let private indent (str: string) =
     |> String.concat "\n"
 
 let private steriliseImport (import: string) =
-    import
+    "_"
+    + import
         .Replace('@', '_')
         .Replace('-', '_')
         .Replace('.', '_')
@@ -28,8 +29,14 @@ let moduleTemplate name children =
 let importTemplate import =
     $"""import * as %s{steriliseImport import} from "%s{import}";"""
 
-let emitProp (prop: Prop) =
-    propTemplate (string prop.kind) prop.typedef
+let exportTemplate name source =
+    $"""export * as %s{name} from "%s{source}";"""
+
+let emitMember (mem: Member) =
+    match mem.kind with
+    | Import -> importTemplate mem.typedef
+    | Export -> exportTemplate mem.typedef (Option.defaultValue "" mem.secondPart)
+    | _ -> propTemplate (string mem.kind) mem.typedef
 
 let emitModule (nmsp: ContractedNamespace) =
     moduleTemplate
@@ -37,7 +44,7 @@ let emitModule (nmsp: ContractedNamespace) =
         (nmsp.children
          |> List.map (function
              | CRef ref -> refTemplate ref
-             | CPrp prop -> emitProp prop)
+             | CMem prop -> emitMember prop)
          |> String.concat "\n")
 
 let emitAllModules =
@@ -46,16 +53,10 @@ let emitAllModules =
 let emitImports =
     List.map importTemplate >> String.concat "\n"
 
-let emitFull imports decls modules =
-    let emittedImports =
-        match imports with
-        | Some i -> emitImports i
-        | None -> ""
+let emitFull decls modules =
+    let emittedDecls =
+        Option.defaultValue "" decls
 
-    let emittedDecls = Option.defaultValue "" decls
+    let emittedModules = emitAllModules modules
 
-    [emittedImports
-     emittedDecls
-     emitAllModules modules]
-    |> String.concat "\n\n"
-    |> trimString
+    (emittedDecls + "\n\n" + emittedModules).Trim()

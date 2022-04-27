@@ -22,7 +22,7 @@ let main _ =
         let defs = 
             def.defs
             |> Transform.flatten // @cumcord/* import madness
-            |> Emitter.emitFull def.imports def.decls // emit to .d.ts defs
+            |> Emitter.emitFull def.decls // emit to .d.ts defs
             
         printfn $"%s{defs}" 
         0
