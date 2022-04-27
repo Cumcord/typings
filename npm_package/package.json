@@ -8,5 +8,11 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Cumcord/typings.git"
+  },
+  "dependencies": {
+    "nests": "^2.3.1",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "spitroast": "^1.4.1"
   }
 }

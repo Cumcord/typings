@@ -3,6 +3,8 @@ toplevel: '@cumcord'
 imports:
   - nests
   - spitroast
+  - react
+  - react-dom
 
 decls: |
   interface ModalOptions {
@@ -63,7 +65,7 @@ decls: |
     // onLoad actually has a very complex type, but honestly thats such a corner case that its not worth it
     onLoad?: () => void
     onUnload: () => void
-    settings?: Function | Object // TODO: react element | component
+    settings?: react.ComponentType<any> | react.ElementType
   }
   
   interface InstalledNestValue {
@@ -130,8 +132,8 @@ defs:
     - [const, 'Flux: Object']
     - [const, 'FluxDispatcher: Object']
     - [const, 'i18n: Object']
-    - [const, 'React: Object']
-    - [const, 'ReactDOM: Object']
+    - [const, 'React: typeof react']
+    - [const, 'ReactDOM: typeof react_dom']
     - [const, 'Redux: Object']
     - [const, 'zustand: Function']
     - [const, 'highlightjs: Object']
@@ -140,12 +142,10 @@ defs:
       - [function, 'v4(): string']
 
   - internal:
+    - [const, 'nests: typeof nests']
     - idbKeyval:
       - [function, 'get<T>(path: string): Promise<T>']
       - [function, 'set<T>(path: string, value: T): Promise<void>']
-    - nests:
-      - [const, 'Events: typeof nests.Events']
-      - [const, 'make: typeof nests.make']
 
 - plugins:
   - [function, 'importPlugin(url: string): Promise<void>']
@@ -178,10 +178,8 @@ defs:
   
 - ui:
   - components:
-    - [const, 'ErrorBoundary: Function'] # TODO: React component
+    - [const, 'ErrorBoundary: react.ComponentType']
   - modals:
     - [function, 'showConfirmationModal(data: ModalOptions, callback?: (res: boolean) => void): Promise<boolean>']
   - toasts:
     - [function, 'showToast(data: ToastOptions): void']
-
-# TODO: double-check all defs and that imports work right
