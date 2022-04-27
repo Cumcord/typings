@@ -37,38 +37,48 @@ and private (|Namespace|_|) =
     | YamlValue.StringMapping [|(name, NamespaceChildren c)|] -> Some {name = name; children = c}
     | _ -> None
 
-let private (|Imports|_|) =
+let private (|YmlStrArr|_|) =
     function
     | YamlValue.Sequence elems ->
-        let imps =
+        let strs =
             elems
             |> Seq.toList
             |> List.choose (function
                 | YamlValue.String s -> Some s
                 | _ -> None)
 
-        if imps.Length = elems.Length then
-            Some imps
+        if strs.Length = elems.Length then
+            Some strs
         else
             None
     | _ -> None
 
-let private (|TypeDef|_|) name (topLevel: YamlValue) =
-    match topLevel?defs with
-    | Some (NamespaceChildren defs) ->
-        let makeNs imports =
+let private (|TypeDef|_|) (ymlRoot: YamlValue) =
+    let imports =
+        match ymlRoot?imports with
+        | Some (YmlStrArr i) -> Some i
+        | _ -> None
+
+    let decls =
+        match ymlRoot?decls with
+        | Some (YmlStrArr d) -> Some d
+        | _ -> None
+
+    match ymlRoot?toplevel with
+    | Some (YamlValue.String toplevel) ->
+        match ymlRoot?defs with
+        | Some (NamespaceChildren defs) ->
+
             Some
                 {imports = imports
-                 defs = {name = name; children = defs}}
+                 decls = decls
+                 defs = {name = toplevel; children = defs}}
 
-        match topLevel?imports with
-        | Some (Imports i) -> makeNs (Some i)
-        | None -> makeNs None
         | _ -> None
     | _ -> None
 
-let parse name =
+let parse =
     YamlValue.Parse
-    >> function
-        | TypeDef name d -> Some d
+    >> function // active patterns moment
+        | TypeDef d -> Some d
         | _ -> None

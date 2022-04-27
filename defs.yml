@@ -1,5 +1,10 @@
+toplevel: @cumcord
+
 imports:
   - nests
+
+decls:
+- ''
 
 defs:
 - [function, 'uninject(): void']

@@ -46,11 +46,15 @@ let emitAllModules =
 let emitImports =
     List.map importTemplate >> String.concat "\n"
 
-let emitFull imports modules =
+let emitFull imports (decls: string list option) modules =
     let emittedImports =
-        match imports with
-        | Some i -> emitImports i
-        | None -> ""
+        callFallback "" emitImports imports
 
-    (emittedImports + "\n\n" + emitAllModules modules)
-        .Trim()
+    let emittedDecls =
+        callFallback "" (String.concat "\n") decls
+
+    [emittedImports
+     emittedDecls
+     emitAllModules modules]
+    |> String.concat "\n\n"
+    |> trimString
