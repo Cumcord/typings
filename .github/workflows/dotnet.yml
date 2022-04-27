@@ -69,7 +69,9 @@ jobs:
           cd npm_package
           npm i
           cd ..
-          touch tsconfig.json
+
+          echo '{"compilerOptions":{"target":"esnext","moduleResolution":"node"}}' > tsconfig.json
+
           typedoc npm_package/defs.d.ts
 
       - run: tar --directory docs -hcf artifact.tar .
