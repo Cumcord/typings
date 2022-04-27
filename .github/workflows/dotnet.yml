@@ -66,6 +66,9 @@ jobs:
 
       - name: Build docs page
         run: |
+          cd npm_package
+          npm i
+          cd ..
           touch tsconfig.json
           typedoc npm_package/defs.d.ts
 
