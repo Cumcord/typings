@@ -1,31 +1,128 @@
-toplevel: @cumcord
+toplevel: '@cumcord'
 
 imports:
   - nests
+  - spitroast
 
-decls:
-- ''
+decls: |
+  interface ModalOptions {
+    header?: string
+    confirmText?: string
+    cancelText?: string
+    content?: string
+    type?: "neutral" | "danger" | "confirm"
+  }
+  
+  interface ToastOptions {
+    title: string
+    content?: string
+    onClick?: () => void
+    className?: string
+    duration?: number
+  }
+  
+  interface CommandArg {
+    name: string,
+    description: string,
+    type?: "string" | "bool" | "user" | "channel" | "role"
+    required?: boolean
+  }
+  
+  interface CommandOptions {
+    name: string
+    description: string
+    args: CommandArg[]
+    handler: (ctx: any, send: (m: string | Object) => void) => Promise<string | void> | string | void
+  }
+  
+  type TreeSearchFilter = string | ((node: any) => boolean)
+  
+  interface TreeSearchOptions {
+    walkable?: string[]
+    ignore?: string[]
+    limit?: number
+  }
+  
+  interface BatchFindFilters {
+    find:    (filter: (m: any) => boolean) => void
+    findAll: (filter: (m: any) => boolean) => void
+  
+    findByDisplayName:    (name: string, defExp?: boolean) => void
+    findByDisplayNameAll: (name: string, defExp?: boolean) => void
+  
+    findByKeywordAll:    (...keywords: string[]) => void
+    findByProps:         (...props:    string[]) => void
+    findByPropsAll:      (...props:    string[]) => void
+    findByPrototypes:    (...protos:   string[]) => void
+    findByPrototypesAll: (...protos:   string[]) => void
+    findByStrings:       (...strs:     string[]) => void
+    findByStringsAll:    (...strs:     string[]) => void
+  }
+  
+  interface LoadedNestValue {
+    // onLoad actually has a very complex type, but honestly thats such a corner case that its not worth it
+    onLoad?: () => void
+    onUnload: () => void
+    settings?: Function | Object // TODO: react element | component
+  }
+  
+  interface InstalledNestValue {
+    enabled: boolean
+    js: string
+    update: boolean
+    manifest: Object // is it worth replicating the manifest format twice? probably not.
+  }
+  
+  type InjectCssReturn = (newCSS?: string) => void | InjectCssReturn
+  
+  interface DomFindOptions {
+    parent?: boolean
+    displayName?: boolean
+    blockList?: string[]
+  }
 
 defs:
 - [function, 'uninject(): void']
 - [function, 'cum(size?: number, strength?: number): string | Promise<string>']
+
+- pluginData:
+  - [const, 'id: string']
+  - [const, 'persist: nests.Nest<any>']
+  
+  - manifest:
+    - [const, 'name: string']
+    - [const, 'description: string']
+    - [const, 'author: string']
+    - [const, 'license: undefined | string']
+    - [const, 'media: undefined | string | string[]']
+    - [const, 'url: undefined | string'] # origin hosting URL, added by mirroring repos
+
 - dev:
   - [function, 'showSettings(): void']
   - [function, 'toggleDevMode(): void']
+  - [const, 'isEnabled: boolean']
+  - [const, 'storage: undefined | nests.Nest<any>']
+
+- commands:
+  - [function, 'addCommand(opts: CommandOptions): () => void']
 
 - modules:
   - webpack:
     - [const, 'modules: Object']
-    - [function, 'find(filter: Function): any']
-    - [function, 'findAll(filter: Function): any[]']
+    - [function, 'getModule(mod: any): any']
+    - [function, 'find(filter: (m: any) => boolean): any']
+    - [function, 'findAll(filter: (m: any) => boolean): any[]']
     - [function, 'findByProps(...props: string[]): any']
     - [function, 'findByPropsAll(...props: string[]): any[]']
     - [function, 'findByPrototypes(...protos: string[]): any']
-    - [function, 'findByDisplayName(name: string, parent?: boolean): any']
-    - [function, 'findByDisplayNameAll(name: string): any[]']
+    - [function, 'findByPrototypesAll(...protos: string[]): any[]']
+    - [function, 'findByDisplayName(name: string, defaultExp?: boolean): any']
+    - [function, 'findByDisplayNameAll(name: string, defaultExp?: boolean): any[]']
     - [function, 'findByStrings(...searches: string[]): any']
+    - [function, 'findByStringsAll(...searches: string[]): any[]']
     - [function, 'findByKeywordAll(...keywords: string[]): any[]']
-    - [function, 'findAsync(filter: () => any): [Promise<any>, () => void]']
+    - [function, 'findAsync(filter: () => any, legacy: false): [Promise<any>, () => void]']
+    - [function, 'batchFind(callback: (filters: BatchFindFilters) => void): any[]']
 
   - common:
     - [const, 'constants: Object']
@@ -47,28 +144,27 @@ defs:
       - [function, 'get<T>(path: string): Promise<T>']
       - [function, 'set<T>(path: string, value: T): Promise<void>']
     - nests:
-      - [const, 'Events: nests.Events']
-      - [const, 'make: nests.make']
+      - [const, 'Events: typeof nests.Events']
+      - [const, 'make: typeof nests.make']
 
 - plugins:
   - [function, 'importPlugin(url: string): Promise<void>']
   - [function, 'removePlugin(id: string): void']
   - [function, 'togglePlugin(id: string): void']
-  # TODO: Properly type these records (add an extra field to the yaml syntax)
-  - [const, 'installed: nests.Nest<Record<string, Object>>']
-  - [const, 'loaded: nests.Nest<Record<string, Object>>']
+  - [const, 'installed: nests.Nest<Record<string, InstalledNestValue>>']
+  - [const, 'loaded: nests.Nest<Record<string, LoadedNestValue>>']
 
 - patcher:
-  - [function, 'before(funcName: string, funcParent: Object | Function, callback: (args: any[]) => any[] | undefined): () => void']
-  - [function, 'after(funcName: string, funcParent: Object | Function, callback: (args: any[], ret: any) => any | undefined): () => void']
-  - [function, 'instead(funcName: string, funcParent: Object | Function, callback: (args: any[], orig: Function) => any | undefined): () => void']
-  # TODO: find a way to type this accurately
-  - [function, 'injectCss(css: string): () => void']
+  - [const, 'before: typeof spitroast.before']
+  - [const, 'after: typeof spitroast.after']
+  - [const, 'instead: typeof spitroast.instead']
+  - [function, 'injectCss(css: string): InjectCssReturn']
   - [function, 'findAndPatch<T>(modFind: () => T | undefined, patchCallback: (m: T) => () => void): () => void']
 
 - utils:
-  - [function, 'findInTree(tree: any[] | Object, filter: string | ((obj: any[] | Object) => boolean), options: { walkable?: string[], ignore?: string[], limit?: number }): any']
-  - [function, 'findInReactTree(tree: any[] | Object, filter: string | ((obj: any[] | Object) => boolean)): any']
+  - [function, 'findInTree(tree: any[] | Object, filter: TreeSearchFilter, options: TreeSearchOptions): any']
+  - [function, 'findInReactTree(tree: any[] | Object, filter: TreeSearchFilter): any']
+  - [function, 'findByDomNode(node: HTMLElement, opts?: DomFindOptions): any']
   - [function, 'copyText(text: string): void']
   - [function, 'getOwnerInstance(elem: any): any']
   - [function, 'getReactInstance(elem: HTMLElement): any']
@@ -84,8 +180,8 @@ defs:
   - components:
     - [const, 'ErrorBoundary: Function'] # TODO: React component
   - modals:
-    - [function, 'showConfirmationModal(data: {header?: string, confirmText?: string, cancelText?: string, content?: string, type?: string}, callback?: (res: boolean) => void): Promise<boolean>']
+    - [function, 'showConfirmationModal(data: ModalOptions, callback?: (res: boolean) => void): Promise<boolean>']
   - toasts:
-    - [function, 'showToast(data: {title: string, content?: string, onClick?: Function, className?: string, duration?: number}): void']
+    - [function, 'showToast(data: ToastOptions): void']
 
 # TODO: double-check all defs and that imports work right

@@ -37,7 +37,7 @@ and private (|Namespace|_|) =
     | YamlValue.StringMapping [|(name, NamespaceChildren c)|] -> Some {name = name; children = c}
     | _ -> None
 
-let private (|YmlStrArr|_|) =
+let private (|Imports|_|) =
     function
     | YamlValue.Sequence elems ->
         let strs =
@@ -56,12 +56,12 @@ let private (|YmlStrArr|_|) =
 let private (|TypeDef|_|) (ymlRoot: YamlValue) =
     let imports =
         match ymlRoot?imports with
-        | Some (YmlStrArr i) -> Some i
+        | Some (Imports i) -> Some i
         | _ -> None
 
     let decls =
         match ymlRoot?decls with
-        | Some (YmlStrArr d) -> Some d
+        | Some (YamlValue.String d) -> Some d
         | _ -> None
 
     match ymlRoot?toplevel with

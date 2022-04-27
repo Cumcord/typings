@@ -46,12 +46,13 @@ let emitAllModules =
 let emitImports =
     List.map importTemplate >> String.concat "\n"
 
-let emitFull imports (decls: string list option) modules =
+let emitFull imports decls modules =
     let emittedImports =
-        callFallback "" emitImports imports
+        match imports with
+        | Some i -> emitImports i
+        | None -> ""
 
-    let emittedDecls =
-        callFallback "" (String.concat "\n") decls
+    let emittedDecls = Option.defaultValue "" decls
 
     [emittedImports
      emittedDecls

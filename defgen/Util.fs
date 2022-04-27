@@ -39,7 +39,7 @@ and FullNamespaceChild =
 
 type ParsedDefs =
     {imports: string list option
-     decls: string list option
+     decls: string option
      defs: FullNamespace}
 
 // (full name, subname)
@@ -55,9 +55,3 @@ type ContractedNamespace =
 
 // more functional and nice than a member access
 let trimString (x: string) = x.Trim()
-
-// for working with options
-let callFallback fallback func =
-    function
-    | Some s -> func s
-    | None -> fallback
