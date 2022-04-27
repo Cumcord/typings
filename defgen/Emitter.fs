@@ -29,13 +29,18 @@ let moduleTemplate name children =
 let importTemplate import =
     $"""import * as %s{steriliseImport import} from "%s{import}";"""
 
-let exportTemplate name source =
+let reExportTemplate name source =
     $"""export * as %s{name} from "%s{source}";"""
+
+let exportTemplate export = $"export {{ %s{export} }};"
 
 let emitMember (mem: Member) =
     match mem.kind with
     | Import -> importTemplate mem.typedef
-    | Export -> exportTemplate mem.typedef (Option.defaultValue "" mem.secondPart)
+    | Export ->
+        match mem.secondPart with
+        | Some src -> reExportTemplate mem.typedef src
+        | None -> exportTemplate mem.typedef
     | _ -> propTemplate (string mem.kind) mem.typedef
 
 let emitModule (nmsp: ContractedNamespace) =

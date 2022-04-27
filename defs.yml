@@ -128,7 +128,10 @@ defs:
     - [const, 'Flux: Object']
     - [const, 'FluxDispatcher: Object']
     - [const, 'i18n: Object']
-    - [export, React, react]
+    # @types/react defs use `export =` format, so instead of export * from, import * from + export{} must be used
+    # this workaround does not affect the functionality of typedoc
+    - [import, react]
+    - [export, _react as React]
     - [export, ReactDOM, react-dom]
     - [const, 'Redux: Object']
     - [const, 'zustand: Function']
