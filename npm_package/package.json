@@ -10,9 +10,14 @@
     "url": "git+https://github.com/Cumcord/typings.git"
   },
   "dependencies": {
+    "@types/flux": "^3.1.11",
     "@types/react": "^18.0.8",
     "@types/react-dom": "^18.0.0",
+    "discord-types": "^1.2.23",
+    "highlight.js": "^11.5.1",
     "nests": "^2.3.1",
-    "spitroast": "^1.4.1"
+    "redux": "^4.2.0",
+    "spitroast": "^1.4.1",
+    "zustand": "^4.0.0-rc.0"
   }
 }

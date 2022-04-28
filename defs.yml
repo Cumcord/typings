@@ -77,6 +77,12 @@ decls: |
     blockList?: string[]
   }
 
+  interface WebpackModule {
+    id: number
+    loaded: true
+    exports: any
+  }
+
 defs:
 - [function, 'uninject(): void']
 - [function, 'cum(size?: number, strength?: number): string | Promise<string>']
@@ -106,7 +112,7 @@ defs:
 
 - modules:
   - webpack:
-    - [const, 'modules: Object']
+    - [const, 'modules: { [id: number]: WebpackModule }']
     - [function, 'getModule(mod: any): any']
     - [function, 'find(filter: (m: any) => boolean): any']
     - [function, 'findAll(filter: (m: any) => boolean): any[]']
@@ -123,19 +129,21 @@ defs:
     - [function, 'batchFind(callback: (filters: BatchFindFilters) => void): any[]']
 
   - common:
-    - [const, 'constants: Object']
-    - [const, 'channels: Object']
-    - [const, 'Flux: Object']
-    - [const, 'FluxDispatcher: Object']
-    - [const, 'i18n: Object']
+    - [import, discord-types]
+    - [const, 'constants: _discord_types.constants']
+    - [const, 'channels: _discord_types.SelectedChannelStore']
+    - [export, Flux, flux]
+    - [const, 'FluxDispatcher: _discord_types.FluxDispatcher']
+    - [const, 'i18n: any']
     # @types/react defs use `export =` format, so instead of export * from, import * from + export{} must be used
     # this workaround does not affect the functionality of typedoc
     - [import, react]
     - [export, _react as React]
     - [export, ReactDOM, react-dom]
-    - [const, 'Redux: Object']
-    - [const, 'zustand: Function']
-    - [const, 'highlightjs: Object']
+    - [export, Redux, redux]
+    - [import, zustand]
+    - [const, 'zustand: typeof _zustand.default']
+    - [export, highlightjs, 'highlight.js']
 
     - uuid:
       - [function, 'v4(): string']

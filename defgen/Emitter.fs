@@ -24,6 +24,7 @@ let refTemplate ref =
 let moduleTemplate name children =
     $"""declare module "%s{name}" {{
 %s{indent children}
+  export * as default from "%s{name}"
 }}"""
 
 let importTemplate import =
