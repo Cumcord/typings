@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    name: Build generator and definitions
     runs-on: ubuntu-latest
 
     steps:
@@ -17,20 +18,14 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 6.0.x
-      - uses: actions/setup-node@v2
-        with:
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install dependencies
-        run: |
-          dotnet restore
-          npm i -g typescript typedoc
 
       - name: Build
         run: |
           build () {
             dotnet publish -r $1 --no-restore --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=True -p:TrimMode=Link defgen/defgen.fsproj -o build/$1/
           }
+
+          dotnet restore
 
           build linux-x64
           build win-x64
@@ -40,13 +35,15 @@ jobs:
           mv build/win-x64/defgen.exe build/defgen-win.exe
           mv build/osx-x64/defgen build/defgen-osx
 
-          rm build/*/*.pdb
+          rm -rf build/*/*.pdb
+          rm -rf build/linux-x64
+          rm -rf build/win-x64
+          rm -rf build/osx-x64
 
       - name: Generate defs
         run: |
           chmod +x build/defgen-linux
           cat defs.yml | build/defgen-linux > build/defs.d.ts
-          mv build/defs.d.ts npm_package/
 
       - name: Publish artifacts
         uses: ncipollo/release-action@v1
@@ -56,6 +53,29 @@ jobs:
           allowUpdates: true
           tag: build
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: sitereqs
+          path: build
+
+  publish:
+    name: Publish the type definitions
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          registry-url: 'https://registry.npmjs.org'
+      - uses: actions/download-artifact@v3
+        with:
+          name: sitereqs
+          path: build
+
+      - run: mv build/defs.d.ts npm_package
       - name: Publish package
         if: startsWith(github.ref, 'refs/tags/')
         working-directory: npm_package
@@ -64,8 +84,30 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Build docs page
+  build-site:
+    name: Build the TypeDoc site
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/')
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm i -g typescript typedoc
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: sitereqs
+          path: build
+
+      - name: Build the documentation
         run: |
+          mv build/defs.d.ts npm_package
           cd npm_package
           npm i
           cd ..
@@ -80,11 +122,13 @@ jobs:
           name: github-pages
           path: ./artifact.tar
 
-  # Deploy the artifact to GitHub pages.
+  # Deploy the above artifact to GitHub pages.
   # This is a separate job so that only actions/deploy-pages has the necessary permissions.
   deploy:
-    needs: build
+    name: Deploy to Pages
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/')
+    needs: build-site
     permissions:
       pages: write
       id-token: write

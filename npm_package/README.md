@@ -11,3 +11,7 @@ However, if they do not, please add the following to the top of your TypeScript 
 ```ts
 /// <reference path="path/to/node_modules/cumcord-typings/defs.d.ts" />
 ```
+
+# NOTE
+
+If you are viewing this README from our TypeDoc website, please note that the documentation displayed here may be ahead of the NPM package.
