@@ -12,9 +12,9 @@ let private (|MemType|_|) =
 let private (|Member|_|) =
     function
     // active patterns and just pattern matching in general :SanOhYes:
-    | YamlValue.Sequence [|MemType Export; YamlValue.String name; YamlValue.String src|] ->
+    | YamlValue.Sequence [|MemType (Export | Import as k); YamlValue.String name; YamlValue.String src|] ->
         Some
-            {kind = Export
+            {kind = k
              typedef = name
              secondPart = Some src}
     | YamlValue.Sequence [|MemType t; YamlValue.String def|] ->

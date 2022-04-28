@@ -27,8 +27,11 @@ let moduleTemplate name children =
   export * as default from "%s{name}"
 }}"""
 
-let importTemplate import =
+let importAllTemplate import =
     $"""import * as %s{steriliseImport import} from "%s{import}";"""
+
+let importTemplate import source =
+    $"""import %s{import} from "%s{source}";"""
 
 let reExportTemplate name source =
     $"""export * as %s{name} from "%s{source}";"""
@@ -37,7 +40,10 @@ let exportTemplate export = $"export {{ %s{export} }};"
 
 let emitMember (mem: Member) =
     match mem.kind with
-    | Import -> importTemplate mem.typedef
+    | Import ->
+        match mem.secondPart with
+        | Some src -> importTemplate mem.typedef src
+        | None -> importAllTemplate mem.typedef
     | Export ->
         match mem.secondPart with
         | Some src -> reExportTemplate mem.typedef src
@@ -57,7 +63,7 @@ let emitAllModules =
     List.map emitModule >> String.concat "\n\n"
 
 let emitImports =
-    List.map importTemplate >> String.concat "\n"
+    List.map importAllTemplate >> String.concat "\n"
 
 let emitFull decls modules =
     let emittedDecls =

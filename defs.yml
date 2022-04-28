@@ -129,11 +129,9 @@ defs:
     - [function, 'batchFind(callback: (filters: BatchFindFilters) => void): any[]']
 
   - common:
-    - [import, discord-types]
-    - [const, 'constants: _discord_types.constants']
-    - [const, 'channels: _discord_types.SelectedChannelStore']
+    - [import, '{ constants, SelectedChannelStore, FluxDispatcher }', discord-types]
+    - [export, 'constants, SelectedChannelStore as channels, FluxDispatcher']
     - [export, Flux, flux]
-    - [const, 'FluxDispatcher: _discord_types.FluxDispatcher']
     - [const, 'i18n: any']
     # @types/react defs use `export =` format, so instead of export * from, import * from + export{} must be used
     # this workaround does not affect the functionality of typedoc
