@@ -3,7 +3,7 @@
   "description": "Type definitions for Cumcord.",
   "author": "Alyxia Sother",
   "license": "CC0-1.0",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "types": "defs.d.ts",
   "repository": {
     "type": "git",
