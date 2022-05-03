@@ -166,7 +166,7 @@ defs:
   - [const, 'before: typeof _spitroast.before']
   - [const, 'after: typeof _spitroast.after']
   - [const, 'instead: typeof _spitroast.instead']
-  - [function, 'injectCss(css: string): InjectCssReturn']
+  - [function, 'injectCSS(css: string): InjectCssReturn']
   - [function, 'findAndPatch<T>(modFind: () => T | undefined, patchCallback: (m: T) => () => void): () => void']
 
 - utils:
