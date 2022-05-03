@@ -129,8 +129,9 @@ defs:
     - [function, 'batchFind(callback: (filters: BatchFindFilters) => void): any[]']
 
   - common:
-    - [import, '{ constants, SelectedChannelStore, FluxDispatcher }', discord-types]
-    - [export, 'constants, SelectedChannelStore as channels, FluxDispatcher']
+    - [import, '{ Constants, FluxDispatcher }', 'discord-types/other']
+    - [import, '{ SelectedChannelStore }', 'discord-types/stores']
+    - [export, 'Constants as constants, SelectedChannelStore as channels, FluxDispatcher']
     - [export, Flux, flux]
     - [const, 'i18n: any']
     # @types/react defs use `export =` format, so instead of export * from, import * from + export{} must be used
