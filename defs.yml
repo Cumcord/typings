@@ -1,6 +1,18 @@
 toplevel: '@cumcord'
 
 decls: |
+  declare module '*.css' {
+    export default function injectStyles(): () => void;
+  }
+
+  declare module '*.scss' {
+    export default function injectStyles(): () => void;
+  }
+
+  declare module '*.sass' {
+    export default function injectStyles(): () => void;
+  } 
+
   interface ModalOptions {
     header?: string
     confirmText?: string
