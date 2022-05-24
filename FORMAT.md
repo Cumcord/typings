@@ -8,7 +8,7 @@ In this case `'@cumcord'`.
 The `decls` keys is a string to insert at the top of the defs file before the generated defs, allowing shared and recursive types for example.
 
 ## `defs`
-The `defs` key contains a tree representing the defs. This is where the generator does its work, and the rest of this comment will explain how it works:
+The `defs` key contains a tree representing the defs. This is where the generator does its work, and the rest of this file will explain how it works:
 
 ### Defs: namespaces
 each namespace is represented as a string key mapping to a list:

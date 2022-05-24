@@ -95,6 +95,19 @@ decls: |
     exports: any
   }
 
+  interface WebSocketIncoming {
+    action: string
+    uuid?: string
+  }
+
+  interface WsSenders {
+    raw: (msg: object) => void
+    ok: (msg?: any) => void
+    error: (msg?: any) => void
+  }
+
+  type WebsocketHandler = (msg: WebSocketIncoming, senders: WsSenders) => void
+
 defs:
 - [function, 'uninject(): void']
 - [function, 'cum(size?: number, strength?: number): string | Promise<string>']
@@ -197,7 +210,11 @@ defs:
 
   - [function, 'sleep(time?: number): Promise<void>']
   - [function, 'useNest(nest: _nests.Nest<any>): void']
-  
+
+- websocket:
+  - [function, 'addHandler(action: string, handler: WebsocketHandler): () => void']
+  - [function, 'triggerHandler(msg: string, callback: (o: string) => any): void']
+
 - ui:
   - components:
     - [import, react]
