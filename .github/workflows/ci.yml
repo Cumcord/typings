@@ -19,31 +19,13 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
-      - name: Build
-        run: |
-          build () {
-            dotnet publish -r $1 --no-restore --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=True -p:TrimMode=Link defgen/defgen.fsproj -o build/$1/
-          }
-
-          dotnet restore
-
-          build linux-x64
-          build win-x64
-          build osx-x64
-
-          mv build/linux-x64/defgen build/defgen-linux
-          mv build/win-x64/defgen.exe build/defgen-win.exe
-          mv build/osx-x64/defgen build/defgen-osx
-
-          rm -rf build/*/*.pdb
-          rm -rf build/linux-x64
-          rm -rf build/win-x64
-          rm -rf build/osx-x64
+      - name: Install generator
+        run: dotnet tool install -g TreeType
 
       - name: Generate defs
         run: |
-          chmod +x build/defgen-linux
-          cat defs.yml | build/defgen-linux > build/defs.d.ts
+          mkdir build
+          cat defs.yml | ttgen > build/defs.d.ts
 
       - name: Publish artifacts
         uses: ncipollo/release-action@v1
